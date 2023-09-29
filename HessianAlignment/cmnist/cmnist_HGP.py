@@ -279,7 +279,8 @@ for restart in range(flags.n_restarts):
             env['nll'] = mean_nll(logits, env['labels']).cpu()
             env['acc'] = mean_accuracy(logits, env['labels']).cpu()
             env['irm'] = compute_irm_penalty(logits, env['labels']).cpu()
-            env['sad'] , grad_of_env[edx], flatten_grad_of_env[edx] = compute_sad_penalty(logits, env['labels']).cpu()
+            env['sad'] , grad_of_env[edx], flatten_grad_of_env[edx] = compute_sad_penalty(logits, env['labels'])
+            env['sad'] = env['sad'].cpu()
             # Move env images and labels to CPU after they are used
             env['images'] = env['images'].cpu()
             env['labels'] = env['labels'].cpu()
