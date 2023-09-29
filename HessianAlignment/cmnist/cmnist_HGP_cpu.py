@@ -117,7 +117,8 @@ for restart in range(flags.n_restarts):
         images = torch.stack([images, images], dim=1)
         if not grayscale:
             images[torch.tensor(range(len(images))), (1 - colors).long(), :, :] *= 0
-        return {'images': (images.float() / 255.).cuda(), 'labels': labels[:, None].cuda()}
+        # return {'images': (images.float() / 255.).cuda(), 'labels': labels[:, None].cuda()}
+        return {'images': (images.float() / 255.), 'labels': labels[:, None]}
 
     envs = [
         make_environment(mnist_train[0][::2], mnist_train[1][::2], 0.2),
@@ -154,11 +155,13 @@ for restart in range(flags.n_restarts):
             logits = self.classifier(features)
             return features, logits
 
-    mlp = MLP().cuda()
+    # mlp = MLP().cuda()
+    mlp = MLP()
 
     # Define loss function helpers
     bce_extended = extend(nn.BCEWithLogitsLoss())
 
+    # nll: negative log likelihood
     def mean_nll(logits, y):
         return nn.functional.binary_cross_entropy_with_logits(logits, y)
 
@@ -167,7 +170,8 @@ for restart in range(flags.n_restarts):
         return ((preds - y).abs() < 1e-2).float().mean()
 
     def compute_irm_penalty(logits, y):
-        scale = torch.tensor(1.).cuda().requires_grad_()
+        # scale = torch.tensor(1.).cuda().requires_grad_()
+        scale = torch.tensor(1.).requires_grad_()
         loss = mean_nll(logits * scale, y)
         grad = autograd.grad(loss, [scale], create_graph=True)[0]
         return torch.sum(grad**2)
@@ -209,7 +213,7 @@ for restart in range(flags.n_restarts):
             # )
             loss.backward(
                 retain_graph=True, create_graph=True
-            )
+                )
 
         dict_grads = OrderedDict(
             [
@@ -289,7 +293,8 @@ for restart in range(flags.n_restarts):
         train_nll = torch.stack([envs[0]['nll'], envs[1]['nll']]).mean() 
         train_acc = torch.stack([envs[0]['acc'], envs[1]['acc']]).mean()
 
-        weight_norm = torch.tensor(0.).cuda()
+        # weight_norm = torch.tensor(0.).cuda()
+        weight_norm = torch.tensor(0.)
         for w in mlp.parameters():
             weight_norm += w.norm().pow(2)
         
@@ -456,7 +461,6 @@ for restart in range(flags.n_restarts):
                 test_acc.detach().cpu().numpy(),
                 grayscale_test_acc.detach().cpu().numpy(),
             )
-
         torch.cuda.empty_cache()
 
     final_train_accs.append(train_acc.detach().cpu().numpy())
