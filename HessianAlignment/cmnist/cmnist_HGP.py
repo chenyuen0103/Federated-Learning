@@ -276,10 +276,13 @@ for restart in range(flags.n_restarts):
             #print('features',features.size())
             #env['labels'] = torch.tensor(env['labels'], dtype=torch.int64)
             #print('logits_0',logits_0.size())
-            env['nll'] = mean_nll(logits, env['labels'])
-            env['acc'] = mean_accuracy(logits, env['labels'])
-            env['irm'] = compute_irm_penalty(logits, env['labels'])
-            env['sad'] , grad_of_env[edx], flatten_grad_of_env[edx] = compute_sad_penalty(logits, env['labels'])
+            env['nll'] = mean_nll(logits, env['labels']).cpu()
+            env['acc'] = mean_accuracy(logits, env['labels']).cpu()
+            env['irm'] = compute_irm_penalty(logits, env['labels']).cpu()
+            env['sad'] , grad_of_env[edx], flatten_grad_of_env[edx] = compute_sad_penalty(logits, env['labels']).cpu()
+            # Move env images and labels to CPU after they are used
+            env['images'] = env['images'].cpu()
+            env['labels'] = env['labels'].cpu()
 
             if edx in [0, 1]:
                 # True when the dataset is in training
