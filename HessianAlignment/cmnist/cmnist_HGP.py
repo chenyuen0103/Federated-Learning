@@ -273,14 +273,16 @@ for restart in range(flags.n_restarts):
     flatten_grad_of_env_C1 = {}
     for step in range(flags.steps):
         for edx, env in enumerate(envs):
-            features, logits = mlp(env['images'].cuda())
+            env['images'] = env['images'].cuda()
+            env['labels'] = env['labels'].cuda()
+            features, logits = mlp(env['images'])
             #print('features',features.size())
             #env['labels'] = torch.tensor(env['labels'], dtype=torch.int64)
             #print('logits_0',logits_0.size())
-            env['nll'] = mean_nll(logits, env['labels'].cuda())
-            env['acc'] = mean_accuracy(logits, env['labels'].cuda())
-            env['irm'] = compute_irm_penalty(logits, env['labels'].cuda())
-            env['sad'] , grad_of_env[edx], flatten_grad_of_env[edx] = compute_sad_penalty(logits, env['labels'].cuda())
+            env['nll'] = mean_nll(logits, env['labels'])
+            env['acc'] = mean_accuracy(logits, env['labels'])
+            env['irm'] = compute_irm_penalty(logits, env['labels'])
+            env['sad'] , grad_of_env[edx], flatten_grad_of_env[edx] = compute_sad_penalty(logits, env['labels'])
             # env['images'] = env['images'].cuda()
             # env['labels'] = env['labels'].cuda()
             # Move env images and labels to CPU after they are used
@@ -289,7 +291,7 @@ for restart in range(flags.n_restarts):
             if edx in [0, 1]:
                 # True when the dataset is in training
                 optimizer.zero_grad()
-                env["grads_variance"] = compute_grads_variance(features, env['labels'].cuda(), mlp.classifier)
+                env["grads_variance"] = compute_grads_variance(features, env['labels'], mlp.classifier)
 
         train_nll = torch.stack([envs[0]['nll'], envs[1]['nll']]).mean() 
         train_acc = torch.stack([envs[0]['acc'], envs[1]['acc']]).mean()
@@ -449,6 +451,8 @@ for restart in range(flags.n_restarts):
 
         test_acc = envs[2]['acc']
         grayscale_test_acc = envs[3]['acc']
+        env['images'] = env['images'].cpu()
+        env['labels'] = env['labels'].cpu()
         if step % 100 == 0:
             pretty_print(
                 np.int32(step),
