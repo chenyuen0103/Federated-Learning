@@ -89,7 +89,7 @@ restart_indices = []
 final_train_accs = []
 final_test_accs = []
 final_graytest_accs = []
-for restart in range(flags.n_restarts):
+for restart in range(1,flags.n_restarts):
     print("Restart", restart)
 
     # Load MNIST, make train/val splits, and shuffle train set examples
