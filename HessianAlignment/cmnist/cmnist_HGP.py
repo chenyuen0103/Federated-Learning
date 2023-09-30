@@ -475,7 +475,7 @@ for restart in range(flags.n_restarts):
     final_test_accs.append(test_acc.detach().cpu().numpy())
     final_graytest_accs.append(grayscale_test_acc.detach().cpu().numpy())
     restart_indices = list(range(0, len(final_train_accs)))
-    df = pd.DataFrame(
+    df = pd.DataFrame({
         'Restart Index': restart_indices,
         'Train Accuracy': final_train_accs,
         'Test Accuracy': final_test_accs,
