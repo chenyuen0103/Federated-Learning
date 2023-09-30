@@ -24,6 +24,8 @@ from torch import nn, optim, autograd
 from backpack import backpack, extend
 from backpack.extensions import BatchGrad
 
+import pandas as pd
+
 parser = argparse.ArgumentParser(description='Colored MNIST')
 
 # select your algorithm
@@ -467,10 +469,19 @@ for restart in range(flags.n_restarts):
             )
 
         torch.cuda.empty_cache()
-
+    restart_indices = list(range(1, len(final_train_accs) + 1))
     final_train_accs.append(train_acc.detach().cpu().numpy())
     final_test_accs.append(test_acc.detach().cpu().numpy())
     final_graytest_accs.append(grayscale_test_acc.detach().cpu().numpy())
+    df = pd.DataFrame({
+        'Restart Index': restart_indices,
+        'Train Accuracy': final_train_accs,
+        'Test Accuracy': final_test_accs,
+        'Grayscale Test Accuracy': final_graytest_accs
+    })
+
+    # Save the DataFrame to a CSV file
+    df.to_csv("./results/restart_accuracies.csv", index=False)
     print('Final train acc (mean/std across restarts so far):')
     print(np.mean(final_train_accs), np.std(final_train_accs))
     print('Final test acc (mean/std across restarts so far):')
