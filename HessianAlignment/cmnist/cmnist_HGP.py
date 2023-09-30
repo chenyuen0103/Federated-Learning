@@ -479,19 +479,33 @@ for restart in range(flags.n_restarts):
     final_train_accs.append(train_acc.detach().cpu().numpy())
     final_test_accs.append(test_acc.detach().cpu().numpy())
     final_graytest_accs.append(grayscale_test_acc.detach().cpu().numpy())
-    restart_indices = list(range(0, len(final_train_accs)))
-    df = pd.DataFrame({
-        'Restart Index': restart_indices,
-        'Train Accuracy': final_train_accs,
-        'Test Accuracy': final_test_accs,
-        'Grayscale Test Accuracy': final_graytest_accs
-    })
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # restart_indices = list(range(0, len(final_train_accs)))
+    # df = pd.DataFrame({
+    #     'Restart Index': restart_indices,
+    #     'Train Accuracy': final_train_accs,
+    #     'Test Accuracy': final_test_accs,
+    #     'Grayscale Test Accuracy': final_graytest_accs
+    # })
+    file_exists = os.path.isfile(results_dir / "restart_accuracies.csv")
 
-    # Create the results directory in the same location as the script
+    # If the file doesn't exist, create a new DataFrame and write the header
+    if not file_exists:
+        df = pd.DataFrame(columns=['Restart Index', 'Train Accuracy', 'Test Accuracy', 'Grayscale Test Accuracy'])
+        df.to_csv(results_dir / "restart_accuracies.csv", index=False)
+
+    # Append the new data to the CSV file
+    new_data = {
+        'Restart Index': [restart],
+        'Train Accuracy': [train_acc.detach().cpu().numpy()],
+        'Test Accuracy': [test_acc.detach().cpu().numpy()],
+        'Grayscale Test Accuracy': [grayscale_test_acc.detach().cpu().numpy()]
+    }
+    df_new = pd.DataFrame(new_data)
+    df_new.to_csv(results_dir / "restart_accuracies.csv", mode='a', header=not file_exists, index=False)
+
 
     # Save the DataFrame to a CSV file
-    df.to_csv(results_dir/"restart_accuracies.csv", index=False)
+    # df.to_csv(results_dir/"restart_accuracies.csv", index=False)
     print('Final train acc (mean/std across restarts so far):')
     print(np.mean(final_train_accs), np.std(final_train_accs))
     print('Final test acc (mean/std across restarts so far):')
