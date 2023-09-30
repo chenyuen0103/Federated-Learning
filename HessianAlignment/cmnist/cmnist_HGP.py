@@ -289,7 +289,7 @@ for restart in range(flags.n_restarts):
             if edx in [0, 1]:
                 # True when the dataset is in training
                 optimizer.zero_grad()
-                env["grads_variance"] = compute_grads_variance(features, env['labels'], mlp.classifier)
+                env["grads_variance"] = compute_grads_variance(features, env['labels'].cuda(), mlp.classifier)
 
         train_nll = torch.stack([envs[0]['nll'], envs[1]['nll']]).mean() 
         train_acc = torch.stack([envs[0]['acc'], envs[1]['acc']]).mean()
