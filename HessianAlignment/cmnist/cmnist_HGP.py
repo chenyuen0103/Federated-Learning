@@ -60,7 +60,7 @@ parser.add_argument('--steps', type=int, default=501)
 parser.add_argument('--grayscale_model', action='store_true')
 parser.add_argument('--n_restarts', type=int, default=10)
 parser.add_argument('--seed', type=int, default=0, help='Seed for everything')
-parser.add_argument("--gpu_idx", default='0', type=str, help="gpu_idx.")
+parser.add_argument("--gpu_idx", default='1', type=str, help="gpu_idx.")
 flags = parser.parse_args()
 
 print('Flags:')
