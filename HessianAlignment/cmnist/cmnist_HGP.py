@@ -80,6 +80,7 @@ os.environ['NVIDIA_VISIBLE_DEVICES'] = flags.gpu_idx
 os.environ['CUDA_VISIBLE_DEVICES'] = flags.gpu_idx
 
 
+restart_indices = []
 final_train_accs = []
 final_test_accs = []
 final_graytest_accs = []
@@ -469,11 +470,12 @@ for restart in range(flags.n_restarts):
             )
 
         torch.cuda.empty_cache()
-    restart_indices = list(range(1, len(final_train_accs) + 1))
+    restart_indices.append(restart)
     final_train_accs.append(train_acc.detach().cpu().numpy())
     final_test_accs.append(test_acc.detach().cpu().numpy())
     final_graytest_accs.append(grayscale_test_acc.detach().cpu().numpy())
-    df = pd.DataFrame({
+    restart_indices = list(range(0, len(final_train_accs)))
+    df = pd.DataFrame(
         'Restart Index': restart_indices,
         'Train Accuracy': final_train_accs,
         'Test Accuracy': final_test_accs,
