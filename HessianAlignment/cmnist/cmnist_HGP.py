@@ -76,8 +76,13 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
 import os
+from pathlib import Path
 os.environ['NVIDIA_VISIBLE_DEVICES'] = flags.gpu_idx
 os.environ['CUDA_VISIBLE_DEVICES'] = flags.gpu_idx
+script_dir = Path(os.path.dirname(os.path.abspath(__file__)))
+results_dir = script_dir / 'results'
+if not results_dir.exists():
+    results_dir.mkdir(parents=True)
 
 
 restart_indices = []
@@ -481,9 +486,12 @@ for restart in range(flags.n_restarts):
         'Test Accuracy': final_test_accs,
         'Grayscale Test Accuracy': final_graytest_accs
     })
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Create the results directory in the same location as the script
 
     # Save the DataFrame to a CSV file
-    df.to_csv("./results/restart_accuracies.csv", index=False)
+    df.to_csv(results_dir/"restart_accuracies.csv", index=False)
     print('Final train acc (mean/std across restarts so far):')
     print(np.mean(final_train_accs), np.std(final_train_accs))
     print('Final test acc (mean/std across restarts so far):')
