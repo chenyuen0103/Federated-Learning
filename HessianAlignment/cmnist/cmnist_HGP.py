@@ -273,16 +273,16 @@ for restart in range(flags.n_restarts):
     flatten_grad_of_env_C1 = {}
     for step in range(flags.steps):
         for edx, env in enumerate(envs):
-            features, logits = mlp(env['images'])
+            features, logits = mlp(env['images'].cuda())
             #print('features',features.size())
             #env['labels'] = torch.tensor(env['labels'], dtype=torch.int64)
             #print('logits_0',logits_0.size())
-            env['nll'] = mean_nll(logits, env['labels'])
-            env['acc'] = mean_accuracy(logits, env['labels'])
-            env['irm'] = compute_irm_penalty(logits, env['labels'])
-            env['sad'] , grad_of_env[edx], flatten_grad_of_env[edx] = compute_sad_penalty(logits, env['labels'])
-            env['images'] = env['images'].cuda()
-            env['labels'] = env['labels'].cuda()
+            env['nll'] = mean_nll(logits, env['labels'].cuda())
+            env['acc'] = mean_accuracy(logits, env['labels'].cuda())
+            env['irm'] = compute_irm_penalty(logits, env['labels'].cuda())
+            env['sad'] , grad_of_env[edx], flatten_grad_of_env[edx] = compute_sad_penalty(logits, env['labels'].cuda())
+            # env['images'] = env['images'].cuda()
+            # env['labels'] = env['labels'].cuda()
             # Move env images and labels to CPU after they are used
 
 
@@ -473,6 +473,7 @@ for restart in range(flags.n_restarts):
     print(np.mean(final_test_accs), np.std(final_test_accs))
     print('Final gray test acc (mean/std across restarts so far):')
     print(np.mean(final_graytest_accs), np.std(final_graytest_accs))
+    torch.cuda.empty_cache()
 
 
 # torch.save(mlp, 'model_var.pth')
