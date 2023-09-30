@@ -117,7 +117,8 @@ for restart in range(flags.n_restarts):
         images = torch.stack([images, images], dim=1)
         if not grayscale:
             images[torch.tensor(range(len(images))), (1 - colors).long(), :, :] *= 0
-        return {'images': (images.float() / 255.).cuda(), 'labels': labels[:, None].cuda()}
+        # return {'images': (images.float() / 255.).cuda(), 'labels': labels[:, None].cuda()}
+        return {'images': (images.float() / 255.), 'labels': labels[:, None]}
 
     envs = [
         make_environment(mnist_train[0][::2], mnist_train[1][::2], 0.2),
@@ -280,6 +281,8 @@ for restart in range(flags.n_restarts):
             env['acc'] = mean_accuracy(logits, env['labels'])
             env['irm'] = compute_irm_penalty(logits, env['labels'])
             env['sad'] , grad_of_env[edx], flatten_grad_of_env[edx] = compute_sad_penalty(logits, env['labels'])
+            env['images'] = env['images'].cuda()
+            env['labels'] = env['labels'].cuda()
             # Move env images and labels to CPU after they are used
 
 
