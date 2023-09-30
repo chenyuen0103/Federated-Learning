@@ -91,8 +91,6 @@ final_test_accs = []
 final_graytest_accs = []
 for restart in range(flags.n_restarts):
     print("Restart", restart)
-    if restart < 1:
-        continue
     # Load MNIST, make train/val splits, and shuffle train set examples
 
     mnist = datasets.MNIST('~/datasets/mnist', train=True, download=True)
@@ -524,23 +522,8 @@ for restart in range(flags.n_restarts):
     del new_train_nll
     del irm_penalty
     del sad_penalty
-    del rex_penalty
-    del dict_grads_variance_averaged
-    del fishr_penalty
-    del penalty_weight
-    del test_acc
-    del grayscale_test_acc
     del env
-    del features
-    del logits
-    del flatten_grad_of_env
-    del grad_of_env
-    del flatten_grad_of_env_C0
-    del grad_of_env_C0
-    del flatten_grad_of_env_C1
-    del grad_of_env_C1
-    del grads_0
-    del grads_1
+    del envs
 
 
 
