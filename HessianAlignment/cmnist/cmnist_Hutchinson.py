@@ -192,7 +192,7 @@ for restart in range(flags.n_restarts):
         loss = bce_extended(logits, labels)
         with backpack(BatchGrad()):
             loss.backward(
-                inputs=list(classifier.parameters()), retain_graph=True, create_graph=True
+                retain_graph=True, create_graph=True
             )
 
         dict_grads = OrderedDict(

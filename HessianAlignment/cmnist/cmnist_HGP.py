@@ -512,18 +512,7 @@ for restart in range(flags.n_restarts):
     print('Final gray test acc (mean/std across restarts so far):')
     print(np.mean(final_graytest_accs), np.std(final_graytest_accs))
     torch.cuda.empty_cache()
-    # clear memory
-    del mlp
-    del optimizer
-    del loss
-    del train_nll
-    del train_acc
-    del weight_norm
-    del new_train_nll
-    del irm_penalty
-    del sad_penalty
-    del env
-    del envs
+
 
 
 
